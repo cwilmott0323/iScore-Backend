@@ -1,4 +1,4 @@
-.PHONY: build test help fmt
+.PHONY: build test help fmt compile zip
 
 default: help
 
