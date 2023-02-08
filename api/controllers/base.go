@@ -41,7 +41,7 @@ func (server *Server) Initialize(Dbdriver, DbUser, DbPassword, DbPort, DbHost, D
 	//	AllowedHeaders:   []string{"Authorization", "ACCEPT"},
 	//})
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"https://main.d2b1vch5eo0dfy.amplifyapp.com"},
+		AllowedOrigins: []string{"https://main.dgmwlgzg611l2.amplifyapp.com"},
 		AllowedMethods: []string{
 			http.MethodHead,
 			http.MethodGet,
