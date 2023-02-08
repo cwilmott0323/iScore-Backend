@@ -131,4 +131,4 @@ mocks
 newapi
 db_api
 *.zip
-iScore-api
+iScore-api*
