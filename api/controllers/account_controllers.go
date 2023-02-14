@@ -3,13 +3,19 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"iScore-api/api/auth"
 	"iScore-api/api/models"
 	"iScore-api/api/responses"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -91,8 +97,61 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
+
+	//err = createS3Bucket(accountCreated.AccountId)
+	//if err != nil {
+	//	responses.ERROR(w, http.StatusBadRequest, err)
+	//	return
+	//}
 	responses.JSON(w, http.StatusOK, accountCreated)
 
+}
+
+func createS3Bucket(accountID int64) error {
+	sess, err := session.NewSession(&aws.Config{Region: aws.String("us-east-2")})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Here 1")
+
+	if err != nil {
+		log.Printf("There was an issue uploading to s3: %s", err.Error())
+		return errors.New("error: cant create item")
+	}
+	fmt.Println("Here 2")
+
+	key := strconv.FormatInt(accountID, 10) + "/"
+	_, err = s3.New(sess).PutObject(&s3.PutObjectInput{
+		Bucket: aws.String(os.Getenv("S3_USER_BUCKET")),
+		Key:    aws.String(key),
+	})
+
+	fmt.Println("Here 3")
+
+	if err != nil {
+		log.Printf("There was an issue uploading to s3: %s", err.Error())
+		return errors.New("error: cant create item")
+	}
+
+	fmt.Printf("Successfully uploaded")
+	//sess := sess.Must(sess.NewSession())
+	//uploader := s3manager.NewUploader(sess)
+	//key := "blah/"
+	//fmt.Println("Upload")
+	//_, err := uploader.Upload(&s3manager.UploadInput{
+	//	Bucket: aws.String(os.Getenv("API_SECRET")),
+	//	Key:    aws.String(key),
+	//})
+	//fmt.Println("After")
+	//
+	//if err != nil {
+	//	fmt.Println("Inside Error")
+	//	log.Printf("There was an issue uploading to s3: %s", err.Error())
+	//	return errors.New("error: cant create item")
+	//}
+	//fmt.Println("Return")
+	//return nil
+	return nil
 }
 
 func saltPassword(password string) string {

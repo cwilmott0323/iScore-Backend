@@ -16,4 +16,7 @@ func (s *Server) initializeRoutes() {
 	//s.Router.HandleFunc("/cards/{packCode:[A-Z0-9]{24}}", middlewares.SetMiddlewareAuthentication(s.CardGenerateInit)).Methods("POST", "OPTIONS", "GET")
 	//s.Router.HandleFunc("/cards/me", middlewares.SetMiddlewareAuthentication(s.CardList)).Methods("GET", "OPTIONS")
 	s.Router.HandleFunc("/accounts/me", middlewares.SetMiddlewareAuthentication(s.GetAccountDisplay)).Methods("GET", "OPTIONS")
+	s.Router.HandleFunc("/countries/all", middlewares.SetMiddlewareJSON(s.GetCountries)).Methods("GET")
+	s.Router.HandleFunc("/countries/{countryName:[A-Za-z _-]+}/cities", middlewares.SetMiddlewareJSON(s.GetCities)).Methods("GET")
+	s.Router.HandleFunc("/countries/{countryName:[A-Za-z _-]+}/cities/{cityName:[A-Za-z _-]+}", middlewares.SetMiddlewareJSON(s.GetCitiesInfo)).Methods("GET")
 }

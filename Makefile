@@ -17,9 +17,9 @@ install: test ## Installs the executable or package
 
 compile: fmt test ## Compile for all OS
 	echo "Compiling for every OS and Platform"
-	GOOS=freebsd GOARCH=386 go build -o iScore-api-freebsd-386
+	env GOOS=freebsd GOARCH=386 go build -o iScore-api-freebsd-386
 	env GOOS=linux GOARCH=amd64 go build -o iScore-api-linux-amd64
-	GOOS=windows GOARCH=386 go build -o iScore-api-windows-386
+	env GOOS=windows GOARCH=386 go build -o iScore-api-windows-386
 
 zip: ## zip binary and .env file for lambda deployment
 	zip -j iScore.zip iScore-api-linux-amd64 .env
