@@ -22,7 +22,7 @@ compile: fmt test ## Compile for all OS
 	env GOOS=windows GOARCH=386 go build -o iScore-api-windows-386
 
 zip: ## zip binary and .env file for lambda deployment
-	zip -j iScore.zip iScore-api-linux-amd64 .env
+	zip -j iScore.zip iScore-api-linux-amd64 prod.env dev.env
 
 
 help:

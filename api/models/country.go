@@ -2,8 +2,8 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"github.com/jinzhu/gorm"
+	"log"
 )
 
 type Country struct {
@@ -22,6 +22,6 @@ func (c *Country) GetCountries(db *gorm.DB) ([]Country, error) {
 	if err != nil {
 		return []Country{}, err
 	}
-	fmt.Println(x)
+	log.Println(x)
 	return x, err
 }

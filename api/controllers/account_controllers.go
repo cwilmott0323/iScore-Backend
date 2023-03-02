@@ -59,11 +59,13 @@ func (server *Server) GetAccountDisplay(w http.ResponseWriter, r *http.Request) 
 }
 
 func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Here1")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	fmt.Println("Here2: ", string(body))
 	account := models.Account{}
 	err = json.Unmarshal(body, &account)
 	if err != nil {
@@ -71,15 +73,18 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Here3: ", account.Password)
 	//vars := mux.Vars(r)
 	//createDetails := strings.Split(vars["create"], ":")
 	//
 	//hashedPassword := saltPassword(createDetails)
 
 	if len(account.Password) == 0 {
+		fmt.Println("Failed")
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	fmt.Println("Here4")
 
 	hashedPassword := saltPassword(account.Password)
 
@@ -91,6 +96,7 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		CreatedOn: time.Now(),
 		LastLogin: time.Now(),
 	}
+	fmt.Println("Here5")
 
 	accountCreated, err := account.CreateAccount(server.DB)
 	if err != nil {
@@ -112,13 +118,13 @@ func createS3Bucket(accountID int64) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Here 1")
+	log.Println("Here 1")
 
 	if err != nil {
 		log.Printf("There was an issue uploading to s3: %s", err.Error())
 		return errors.New("error: cant create item")
 	}
-	fmt.Println("Here 2")
+	log.Println("Here 2")
 
 	key := strconv.FormatInt(accountID, 10) + "/"
 	_, err = s3.New(sess).PutObject(&s3.PutObjectInput{
@@ -126,30 +132,30 @@ func createS3Bucket(accountID int64) error {
 		Key:    aws.String(key),
 	})
 
-	fmt.Println("Here 3")
+	log.Println("Here 3")
 
 	if err != nil {
 		log.Printf("There was an issue uploading to s3: %s", err.Error())
 		return errors.New("error: cant create item")
 	}
 
-	fmt.Printf("Successfully uploaded")
+	log.Printf("Successfully uploaded")
 	//sess := sess.Must(sess.NewSession())
 	//uploader := s3manager.NewUploader(sess)
 	//key := "blah/"
-	//fmt.Println("Upload")
+	//log.Println("Upload")
 	//_, err := uploader.Upload(&s3manager.UploadInput{
 	//	Bucket: aws.String(os.Getenv("API_SECRET")),
 	//	Key:    aws.String(key),
 	//})
-	//fmt.Println("After")
+	//log.Println("After")
 	//
 	//if err != nil {
-	//	fmt.Println("Inside Error")
+	//	log.Println("Inside Error")
 	//	log.Printf("There was an issue uploading to s3: %s", err.Error())
 	//	return errors.New("error: cant create item")
 	//}
-	//fmt.Println("Return")
+	//log.Println("Return")
 	//return nil
 	return nil
 }

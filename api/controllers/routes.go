@@ -18,5 +18,9 @@ func (s *Server) initializeRoutes() {
 	s.Router.HandleFunc("/accounts/me", middlewares.SetMiddlewareAuthentication(s.GetAccountDisplay)).Methods("GET", "OPTIONS")
 	s.Router.HandleFunc("/countries/all", middlewares.SetMiddlewareJSON(s.GetCountries)).Methods("GET")
 	s.Router.HandleFunc("/countries/{countryName:[A-Za-z _-]+}/cities", middlewares.SetMiddlewareJSON(s.GetCities)).Methods("GET")
-	s.Router.HandleFunc("/countries/{countryName:[A-Za-z _-]+}/cities/{cityName:[A-Za-z _-]+}", middlewares.SetMiddlewareJSON(s.GetCitiesInfo)).Methods("GET")
+	s.Router.HandleFunc("/countries/{countryName:[A-Za-z _-]+}/cities/{cityName:[A-Za-z _-]+}", middlewares.SetMiddlewareJSON(s.GetActivity)).Methods("GET")
+	s.Router.HandleFunc("/countries/{countryName:[A-Za-z _-]+}/cities/{cityName:[A-Za-z _-]+}/{activityName:[A-Za-z _-]+}", middlewares.SetMiddlewareJSON(s.GetActivityInfo)).Methods("GET")
+	s.Router.HandleFunc("/upload", middlewares.SetMiddlewareAuthentication(s.Upload)).Methods("POST")
+	//s.Router.HandleFunc("/personalise", middlewares.SetMiddlewareAuthentication(s.GetImages)).Methods("GET")
+	s.Router.HandleFunc("/personalise", middlewares.SetMiddlewareJSON(s.GetImages)).Methods("GET")
 }
