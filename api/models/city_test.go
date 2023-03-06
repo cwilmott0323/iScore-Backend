@@ -4,7 +4,7 @@ package models
 //import (
 //	"errors"
 //	"fmt"
-//	"github.com/jinzhu/gorm"
+//	"gorm.io/gorm"
 //	"github.com/stretchr/testify/assert"
 //	"testing"
 //
@@ -22,7 +22,7 @@ package models
 //	TestData(db)
 //
 //	d, err := c.GetCities(db, "England")
-//	fmt.Println("D: ", d[0].CityName)
+//
 //	if err != nil {
 //		return
 //	}
@@ -53,7 +53,7 @@ package models
 //	TestData(db)
 //
 //	d, err := c.GetCitiesInfo(db, "England", "London")
-//	fmt.Println("D: ", d[0])
+//
 //	if err != nil {
 //		return
 //	}

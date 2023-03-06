@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -59,32 +58,29 @@ func (server *Server) GetAccountDisplay(w http.ResponseWriter, r *http.Request) 
 }
 
 func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Here1")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	fmt.Println("Here2: ", string(body))
+
 	account := models.Account{}
+
 	err = json.Unmarshal(body, &account)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	fmt.Println("Here3: ", account.Password)
 	//vars := mux.Vars(r)
 	//createDetails := strings.Split(vars["create"], ":")
 	//
 	//hashedPassword := saltPassword(createDetails)
 
 	if len(account.Password) == 0 {
-		fmt.Println("Failed")
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	fmt.Println("Here4")
 
 	hashedPassword := saltPassword(account.Password)
 
@@ -96,7 +92,6 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		CreatedOn: time.Now(),
 		LastLogin: time.Now(),
 	}
-	fmt.Println("Here5")
 
 	accountCreated, err := account.CreateAccount(server.DB)
 	if err != nil {
@@ -104,12 +99,20 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//err = createS3Bucket(accountCreated.AccountId)
-	//if err != nil {
-	//	responses.ERROR(w, http.StatusBadRequest, err)
-	//	return
-	//}
-	responses.JSON(w, http.StatusOK, accountCreated)
+	server.FillAccountActivities(accountCreated)
+
+	err = createS3Bucket(accountCreated.AccountId)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	token, err := auth.CreateToken(uint32(account.AccountId))
+	if err != nil {
+		responses.JSON(w, http.StatusNotAcceptable, err)
+	}
+
+	responses.JSON(w, http.StatusOK, token)
 
 }
 

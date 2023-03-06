@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"log"
 )
 
@@ -49,7 +49,6 @@ var Cities = []City{
 		CityId:        1,
 		CityName:      "London",
 		ImageLocation: "test",
-		CountryId:     1,
 	},
 }
 
@@ -78,32 +77,34 @@ var CityInfos = []Activity{
 }
 
 func TestData(db *gorm.DB) {
-	err := db.Debug().DropTableIfExists(&Account{}, &City{}, &Activity{}, &Country{}, &CountryCityActivityMap{}).Error
+	err := db.Debug().AutoMigrate(&Account{}, &City{}, &Activity{}, &Country{}, &CountryCityActivityMap{}).Error
 	if err != nil {
 		log.Fatalf("cannot drop table: %v", err)
 	}
+
 	err = db.Debug().AutoMigrate(&Account{}, &City{}, &Activity{}, &Country{}, &CountryCityActivityMap{}).Error
 	if err != nil {
 		log.Fatalf("cannot migrate table: %v", err)
 	}
 
 	for i, _ := range Countries {
-		err = db.Debug().Model(&Country{}).Create(&Countries[i]).Error
-		if err != nil {
+		results := db.Model(&Country{}).Create(&Countries[i])
+
+		if results.Error != nil {
 			log.Fatalf("cannot seed cards table: %v", err)
 		}
 
 	}
 	for i, _ := range Cities {
-		err = db.Debug().Model(&City{}).Create(&Cities[i]).Error
-		if err != nil {
+		results := db.Debug().Model(&City{}).Create(&Cities[i]).Error
+		if results.Error != nil {
 			log.Fatalf("cannot seed users table: %v", err)
 		}
 	}
 
 	for i, _ := range CityInfos {
-		err = db.Debug().Model(&Activity{}).Create(&CityInfos[i]).Error
-		if err != nil {
+		results := db.Debug().Model(&Activity{}).Create(&CityInfos[i]).Error
+		if results.Error != nil {
 			log.Fatalf("cannot seed users table: %v", err)
 		}
 	}
@@ -115,7 +116,7 @@ func Load(db *gorm.DB) {
 	//if err != nil {
 	//	log.Fatalf("cannot drop table: %v", err)
 	//}
-	err := db.Debug().AutoMigrate(&Account{}, &City{}, &Activity{}, &Country{}, &CountryCityActivityMap{}).Error
+	err := db.AutoMigrate(&Account{}, &City{}, &Activity{}, &Country{}, &CountryCityActivityMap{})
 	if err != nil {
 		log.Fatalf("cannot migrate table: %v", err)
 	}

@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"log"
 )
 
@@ -16,9 +16,11 @@ func (c *Country) GetCountries(db *gorm.DB) ([]Country, error) {
 	var err error
 	var x []Country
 	err = db.Debug().Find(&x).Error
-	if gorm.IsRecordNotFoundError(err) {
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return []Country{}, errors.New("no Cities Returned")
 	}
+
 	if err != nil {
 		return []Country{}, err
 	}

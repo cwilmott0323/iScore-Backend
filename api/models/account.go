@@ -2,7 +2,9 @@ package models
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
+	"fmt"
+	"gorm.io/gorm"
+	"strconv"
 	"time"
 )
 
@@ -16,12 +18,20 @@ type Account struct {
 	LastLogin time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"last_login"`
 }
 
+type AccountActivity struct {
+	ActivityId int64 `gorm:"primary_key" json:"activity_id"`
+	Completed  bool  `gorm:"" json:"completed"`
+}
+
 func (a *Account) FindAccountByID(db *gorm.DB, aid uint32) (*Account, error) {
 	var err error
+
 	err = db.Debug().Model(Account{}).Select("name, points").Where("account_id = ?", aid).Take(&a).Error
-	if gorm.IsRecordNotFoundError(err) {
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return &Account{}, errors.New("Account Not Found")
 	}
+
 	if err != nil {
 		return &Account{}, err
 	}
@@ -31,6 +41,9 @@ func (a *Account) FindAccountByID(db *gorm.DB, aid uint32) (*Account, error) {
 func (a *Account) CreateAccount(db *gorm.DB) (*Account, error) {
 	var err error
 	err = db.Debug().Create(&a).Error
+	accountID := string(a.AccountId)
+	fmt.Println("AccountID", accountID)
+	db.Table("account_" + strconv.FormatInt(a.AccountId, 10) + "_activities").AutoMigrate(&AccountActivity{})
 	if err != nil {
 		return &Account{}, err
 	}

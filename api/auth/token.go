@@ -3,13 +3,12 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 func CreateToken(user_id uint32) (string, error) {
@@ -23,7 +22,9 @@ func CreateToken(user_id uint32) (string, error) {
 }
 
 func TokenValid(r *http.Request) error {
+	fmt.Println("Starting token valid: ", r)
 	tokenString := ExtractToken(r)
+	tokenString = strings.Trim(tokenString, "\"")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -54,18 +55,27 @@ func ExtractToken(r *http.Request) string {
 
 func ExtractTokenID(r *http.Request) (uint32, error) {
 	tokenString := ExtractToken(r)
+	fmt.Println("Token String:", tokenString)
+	tokenString = strings.Trim(tokenString, "\"")
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("API_SECRET")), nil
 	})
+
+	fmt.Println("Tokenn: ", token.Valid)
+	fmt.Println("ERROR : ", err)
 	if err != nil {
 		return 0, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
+	fmt.Println("CLAIMS OK: ", claims, ok)
 	if ok && token.Valid {
+		fmt.Println("Token Valid:")
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
+		fmt.Println("UID AND ERROR: ", uid, err)
 		if err != nil {
 			return 0, err
 		}

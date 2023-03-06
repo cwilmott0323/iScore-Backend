@@ -3,7 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"testing"
 )
 

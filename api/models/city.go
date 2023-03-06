@@ -2,14 +2,13 @@ package models
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type City struct {
 	CityId        int64  `gorm:"primary_key;auto_increment" json:"city_id"`
 	CityName      string `gorm:"size(255);not null;" json:"city_name"`
 	ImageLocation string `gorm:"size(255);not null;" json:"image_location"`
-	CountryId     int64  `gorm:"" json:"country_id"`
 }
 
 type CityReturn struct {
