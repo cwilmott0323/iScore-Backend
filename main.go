@@ -13,7 +13,7 @@ func main() {
 	flag.Parse()
 
 	if *env == "prod" {
-		log.Println("inside prod")
+
 		err := godotenv.Load("prod.env")
 		//lambda.Start(api.Run())
 		err = api.Run()
@@ -22,7 +22,7 @@ func main() {
 		}
 	} else {
 		err := godotenv.Load("dev.env")
-		log.Println("inside dev")
+
 		err = api.Run()
 		if err != nil {
 			log.Fatalf("Error: , %v", err)

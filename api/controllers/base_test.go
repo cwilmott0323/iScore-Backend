@@ -2,8 +2,7 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
-	"gorm.io/gorm"
+
 	"testing"
 )
 
@@ -24,7 +23,7 @@ func TestOpenDB(t *testing.T) {
 			db:   "db",
 			port: "4000",
 			sqlOpener: func(s string, s2 ...interface{}) (db *gorm.DB, err error) {
-				fmt.Println(s, s2)
+
 				if s != "postgres" {
 					return nil, errors.New("wrong connection string")
 				}

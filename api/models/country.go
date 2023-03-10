@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"gorm.io/gorm"
-	"log"
 )
 
 type Country struct {
@@ -24,6 +23,6 @@ func (c *Country) GetCountries(db *gorm.DB) ([]Country, error) {
 	if err != nil {
 		return []Country{}, err
 	}
-	log.Println(x)
+
 	return x, err
 }

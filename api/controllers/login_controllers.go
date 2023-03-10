@@ -25,12 +25,6 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//account.Prepare()
-	//err = account.Validate("login")
-	//if err != nil {
-	//	responses.ERROR(w, http.StatusUnprocessableEntity, err)
-	//	return
-	//}
 	token, err := server.SignIn(account.Email, account.Password)
 	if err != nil {
 		formattedError := formaterror.FormatError(err.Error())

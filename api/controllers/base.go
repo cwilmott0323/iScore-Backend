@@ -8,6 +8,7 @@ import (
 	"github.com/rs/cors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
 	"log"
 	"net/http"
 	"os"
@@ -17,10 +18,6 @@ type Server struct {
 	DB     *gorm.DB
 	Router *mux.Router
 }
-
-type (
-	gormOpener func(dialect string, args ...interface{}) (db *gorm.DB, err error)
-)
 
 func (server *Server) Initialize(DbUser, DbPassword, DbPort, DbHost, DbName string) http.Handler {
 
@@ -57,12 +54,12 @@ func (server *Server) Initialize(DbUser, DbPassword, DbPort, DbHost, DbName stri
 }
 
 func (server *Server) Run(addr string, handler http.Handler) {
-	log.Println("Listening to port:", addr)
+
 	if os.Getenv("DEV") == "true" {
-		log.Println("DEV")
+
 		log.Fatal(http.ListenAndServe(addr, handler))
 	}
-	log.Println("PROD")
+
 	log.Fatal(gateway.ListenAndServe(addr, handler))
 }
 
@@ -70,5 +67,4 @@ func OpenDB(DbUser, DbPassword, DbPort, DbHost, DbName string) (*gorm.DB, error)
 	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", DbHost, DbPort, DbUser, DbName, DbPassword)
 
 	return gorm.Open(postgres.Open(DBURL), &gorm.Config{})
-	//return open(Dbdriver, DBURL)
 }

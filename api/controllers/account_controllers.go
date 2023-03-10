@@ -30,7 +30,6 @@ func (server *Server) GetAccountAll(w http.ResponseWriter, r *http.Request) {
 
 	account := models.Account{}
 
-	//server.CheckAuth(w, r)
 	accountGotten, err := account.FindAccountByID(server.DB, userId)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -72,11 +71,6 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//vars := mux.Vars(r)
-	//createDetails := strings.Split(vars["create"], ":")
-	//
-	//hashedPassword := saltPassword(createDetails)
-
 	if len(account.Password) == 0 {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
@@ -99,8 +93,6 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server.FillAccountActivities(accountCreated)
-
 	err = createS3Bucket(accountCreated.AccountId)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -121,13 +113,11 @@ func createS3Bucket(accountID int64) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Here 1")
 
 	if err != nil {
-		log.Printf("There was an issue uploading to s3: %s", err.Error())
+
 		return errors.New("error: cant create item")
 	}
-	log.Println("Here 2")
 
 	key := strconv.FormatInt(accountID, 10) + "/"
 	_, err = s3.New(sess).PutObject(&s3.PutObjectInput{
@@ -135,31 +125,11 @@ func createS3Bucket(accountID int64) error {
 		Key:    aws.String(key),
 	})
 
-	log.Println("Here 3")
-
 	if err != nil {
-		log.Printf("There was an issue uploading to s3: %s", err.Error())
+
 		return errors.New("error: cant create item")
 	}
 
-	log.Printf("Successfully uploaded")
-	//sess := sess.Must(sess.NewSession())
-	//uploader := s3manager.NewUploader(sess)
-	//key := "blah/"
-	//log.Println("Upload")
-	//_, err := uploader.Upload(&s3manager.UploadInput{
-	//	Bucket: aws.String(os.Getenv("API_SECRET")),
-	//	Key:    aws.String(key),
-	//})
-	//log.Println("After")
-	//
-	//if err != nil {
-	//	log.Println("Inside Error")
-	//	log.Printf("There was an issue uploading to s3: %s", err.Error())
-	//	return errors.New("error: cant create item")
-	//}
-	//log.Println("Return")
-	//return nil
 	return nil
 }
 
@@ -209,16 +179,6 @@ func checkPasswordHash(password string, hashedPassword string) bool {
 		return true
 	}
 }
-
-//func (server *Server) CheckAuth(w http.ResponseWriter, r *http.Request) {
-//	if _, ok := r.Header["Authorization"]; !ok {
-//		responses.JSON(w, http.StatusBadRequest, "Authentication header missing")
-//		return
-//	}
-//	api_key := r.Header["Authorization"][0]
-//	KeyCheck := models.APIKey{APIKey: api_key}
-//	KeyCheck.CheckAuth(server.DB)
-//}
 
 func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
