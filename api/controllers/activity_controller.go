@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/paulmach/orb"
 	"iScore-api/api/auth"
 	"strconv"
@@ -20,13 +21,22 @@ func (server *Server) GetActivity(w http.ResponseWriter, r *http.Request) {
 	countryName := vars["countryName"]
 	cityName := vars["cityName"]
 
-	cities, err := activity.GetActivities(server.DB, countryName, cityName)
+	activities, err := activity.GetActivities(server.DB, countryName, cityName)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
 
-	responses.JSON(w, http.StatusOK, cities)
+	fmt.Println("EArly Activities: ", activities)
+
+	for i, v := range activities {
+		imageURL, _ := getImagesS3General(v.ImageLocation)
+		activities[i].ImageLocation = imageURL[0]
+	}
+
+	fmt.Println("Image Location: ", activities)
+
+	responses.JSON(w, http.StatusOK, activities)
 }
 
 func (server *Server) GetActivityInfo(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +56,7 @@ func (server *Server) GetActivityInfo(w http.ResponseWriter, r *http.Request) {
 
 	generalImage, err := getImagesS3General(cities[0].ImageLocation)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 

@@ -2,18 +2,19 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
 type City struct {
 	CityId        int64  `gorm:"primary_key;auto_increment" json:"city_id"`
-	CityName      string `gorm:"size(255);not null;" json:"city_name"`
+	CityName      string `gorm:"size(255);not null;unique" json:"city_name"`
 	ImageLocation string `gorm:"size(255);not null;" json:"image_location"`
 }
 
 type CityReturn struct {
 	CityId        int64  `gorm:"primary_key;auto_increment" json:"city_id"`
-	CityName      string `gorm:"size(255);not null;" json:"city_name"`
+	CityName      string `gorm:"size(255);not null;unique" json:"city_name"`
 	ImageLocation string `gorm:"size(255);not null;" json:"image_location"`
 	CountryId     int64  `gorm:"" json:"country_id"`
 	CountryName   string `gorm:"size(255);not null;" json:"country_name"`
@@ -33,6 +34,8 @@ func (c *City) GetCities(db *gorm.DB, countryName string) ([]CityReturn, error) 
 	if err != nil {
 		return []CityReturn{}, err
 	}
+
+	fmt.Println("City Image: ", x)
 
 	return x, err
 }

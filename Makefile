@@ -15,7 +15,7 @@ fmt: ## Verifies all files have been `gofmt`ed
 install: test ## Installs the executable or package
 	GO111MODULE=on go install
 
-compile: fmt test ## Compile for all OS
+compile: fmt ## Compile for all OS
 	echo "Compiling for every OS and Platform"
 	env GOOS=freebsd GOARCH=386 go build -o iScore-api-freebsd-386
 	env GOOS=linux GOARCH=amd64 go build -o iScore-api-linux-amd64

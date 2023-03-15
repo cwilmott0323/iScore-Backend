@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -125,7 +126,6 @@ func getImagesS3(accountID int64, loc []string) ([]string, error) {
 	resp, err := svc.ListObjectsV2(params)
 
 	if err != nil {
-
 		return nil, err
 	}
 
@@ -145,6 +145,8 @@ func getImagesS3(accountID int64, loc []string) ([]string, error) {
 		})
 
 		urlStr, err := req.Presign(15 * time.Minute)
+
+		fmt.Println("User Images: ", urlStr)
 
 		if err != nil {
 
@@ -168,26 +170,26 @@ func getImagesS3General(loc string) ([]string, error) {
 
 		return nil, errors.New("error: cant create item")
 	}
-
 	svc := s3.New(sess)
 
 	params := &s3.ListObjectsV2Input{
-		Bucket: aws.String(os.Getenv("S3_GENERAL_BUCKET")),
-		Prefix: aws.String(loc),
-		//Delimiter: aws.String("/"),
+		Bucket:    aws.String(os.Getenv("S3_GENERAL_BUCKET")),
+		Prefix:    aws.String(loc),
+		Delimiter: aws.String("/"),
 	}
 
 	resp, err := svc.ListObjectsV2(params)
+	fmt.Println(err)
+
+	fmt.Println("List: ", resp)
 
 	if err != nil {
-
 		return nil, err
 	}
 
 	// Create S3 service client
 
 	if *resp.KeyCount == 0 {
-
 		return nil, nil
 	}
 
@@ -195,15 +197,18 @@ func getImagesS3General(loc string) ([]string, error) {
 		if *key.Size == 0 {
 			continue
 		}
+
+		fmt.Println("Key: ", *key.Key)
+
 		req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
 			Bucket: aws.String(os.Getenv("S3_GENERAL_BUCKET")),
 			Key:    aws.String(*key.Key),
 		})
 
 		urlStr, err := req.Presign(15 * time.Minute)
+		fmt.Println(urlStr)
 
 		if err != nil {
-
 		}
 
 		userImages = append(userImages, urlStr)
